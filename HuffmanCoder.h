@@ -1,12 +1,9 @@
-// Huffman Coding
-
-#include <iostream>
 #include <string>
 #include <algorithm>
 #include <vector>
 #include <functional>
 
-// K denotes the base of the encoding technique
+// K denotes the base of the number that is outputted
 template<int K> class HuffmanCoder {
 	std::vector<std::string> coding;
 	std::vector<float> probabilities;
@@ -37,6 +34,12 @@ template<int K> class HuffmanCoder {
 			__genCodes( t->children[i] , s + (char)(i+'0') );
 		}
 	}
+		
+	void generateCodes() {
+		__genCodes(root,"");
+	}
+	
+	static const float EPSILON = 1e-9;
 	
 	public:
 	void makeTree(int n, float list[]) {
@@ -51,6 +54,10 @@ template<int K> class HuffmanCoder {
 			temp->isVertex = true;
 			temp->prob = list[i];
 			temp->value = i;
+			if ( temp->prob <= EPSILON ) {
+				coding[i] = "Unused";
+				continue;
+			}
 			heap.push_back(std::make_pair(list[i],temp));
 			probabilities[i] = list[i];
 		}
@@ -74,10 +81,7 @@ template<int K> class HuffmanCoder {
 			push_heap(heap.begin(),heap.end(),std::greater< std::pair<float,treeNode*> >());
 		}
 		root = heap[0].second;
-	}
-	
-	void generateCodes() {
-		__genCodes(root,"");
+		generateCodes();
 	}
 	
 	bool getCode(int i, std::string &s) {
@@ -99,22 +103,3 @@ template<int K> class HuffmanCoder {
 		return runningTotal;
 	}
 };
-
-int main() {
-	HuffmanCoder<3> hc;
-	int N;
-	float val[100];
-	std::cin >> N;
-	for ( int i = 0 ; i < N ; i++ ) {
-		std::cin >> val[i];
-	}
-	hc.makeTree(N,val);
-	hc.generateCodes();
-	std::cout << "\n\n";
-	for ( int i = 0 ; i < N ; i++ ) {
-		std::string s;
-		hc.getCode(i,s);
-		std::cout << i << " -> " << s << "\n";
-	}
-	std::cout << "\n\nAverage length of encoding: " << hc.averageLength() << "\n";
-}
