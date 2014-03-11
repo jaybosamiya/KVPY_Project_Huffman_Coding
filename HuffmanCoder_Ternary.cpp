@@ -59,6 +59,10 @@ template<int K> class HuffmanCoder {
 			treeNode *t = new treeNode;
 			t->prob = 0;
 			for ( int i = 0 ; i < K ; i++ ) {
+				if ( heap.size() == 0 ) {
+					t->children[i] = NULL;
+					continue;
+				}
 				t->children[i] = heap[0].second;
 				t->prob += heap[0].first;
 				pop_heap(heap.begin(),heap.end(),std::greater< std::pair<float,treeNode*> >());
@@ -97,7 +101,7 @@ template<int K> class HuffmanCoder {
 };
 
 int main() {
-	HuffmanCoder<2> hc;
+	HuffmanCoder<3> hc;
 	int N;
 	float val[100];
 	std::cin >> N;
