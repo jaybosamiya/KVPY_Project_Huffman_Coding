@@ -3,67 +3,63 @@
 #include <vector>
 #include <functional>
 
-// K denotes the base of the number that is outputted
+// K denotes the base of the encoded number that is outputted
 template<int K> class HuffmanCoder {
-	std::vector<std::string> coding;
+	std::vector<std::string> encoded;
 	std::vector<float> probabilities;
-	struct treeNode {
+	struct Node {
 		bool isVertex;
 		float prob;
 		int value;
-		treeNode *children[K];
-		treeNode() {
+		Node *children[K];
+		Node() {
 			for ( int i = 0 ; i < K ; i++ ) children[i] = NULL;
 		}
-		~treeNode() {
+		~Node() {
 			for ( int i = 0 ; i < K ; i++ ) {
 				delete children[i];
 			}
 		}
 	};
-	treeNode *root;
+	Node *root;
 	int N;
 	
-	void __genCodes(treeNode* t,std::string s) {
+	void generateCodes(Node* t,std::string s) {
 		if ( t == NULL ) return;
 		if ( t->isVertex ) {
-			coding[t->value] = s;
+			encoded[t->value] = s;
 			return;
 		}
 		for ( int i = 0 ; i < K ; i++ ) {
-			__genCodes( t->children[i] , s + (char)(i+'0') );
+			generateCodes( t->children[i] , s + (char)(i+'0') );
 		}
 	}
-		
-	void generateCodes() {
-		__genCodes(root,"");
-	}
 	
-	static const float EPSILON = 1e-9;
+	static const float EPSILON = 1e-9; // minimum probability under which it assumes non existent
 	
 	public:
 	void makeTree(int n, float list[]) {
 		N = n;
-		coding.clear();
-		coding.resize(N,"");
+		encoded.clear();
+		encoded.resize(N,"");
 		probabilities.clear();
 		probabilities.resize(N);
-		std::vector < std::pair<float,treeNode*> > heap;
+		std::vector < std::pair<float,Node*> > heap;
 		for ( int i = 0 ; i < N ; i++ ) {
-			treeNode *temp = new treeNode;
+			Node *temp = new Node;
 			temp->isVertex = true;
 			temp->prob = list[i];
 			temp->value = i;
 			if ( temp->prob <= EPSILON ) {
-				coding[i] = "Unused";
+				encoded[i] = "Unused";
 				continue;
 			}
 			heap.push_back(std::make_pair(list[i],temp));
 			probabilities[i] = list[i];
 		}
-		make_heap(heap.begin(),heap.end(),std::greater< std::pair<float,treeNode*> >());
+		make_heap(heap.begin(),heap.end(),std::greater< std::pair<float,Node*> >());
 		while ( heap.size() > 1 ) {
-			treeNode *t = new treeNode;
+			Node *t = new Node;
 			t->prob = 0;
 			for ( int i = 0 ; i < K ; i++ ) {
 				if ( heap.size() == 0 ) {
@@ -72,23 +68,23 @@ template<int K> class HuffmanCoder {
 				}
 				t->children[i] = heap[0].second;
 				t->prob += heap[0].first;
-				pop_heap(heap.begin(),heap.end(),std::greater< std::pair<float,treeNode*> >());
+				pop_heap(heap.begin(),heap.end(),std::greater< std::pair<float,Node*> >());
 				heap.pop_back();
 			}
 			t->isVertex = false;
 			t->value = -1;
 			heap.push_back(std::make_pair(t->prob,t));
-			push_heap(heap.begin(),heap.end(),std::greater< std::pair<float,treeNode*> >());
+			push_heap(heap.begin(),heap.end(),std::greater< std::pair<float,Node*> >());
 		}
 		root = heap[0].second;
-		generateCodes();
+		generateCodes(root,"");
 	}
 	
 	bool getCode(int i, std::string &s) {
 		if ( i < 0 || i >= N ) {
 			return false;
 		}
-		s = coding[i];
+		s = encoded[i];
 		return true;
 	}
 	
@@ -99,7 +95,7 @@ template<int K> class HuffmanCoder {
 			getCode(i,s);
 			runningTotal += s.size() * probabilities[i];
 		}
-		runningTotal /= root->prob; // should be div by one but sometimes it may not be exactly 1 so...
+		runningTotal /= root->prob; // allows for actual counts instead of probabilities to be used
 		return runningTotal;
 	}
 };
