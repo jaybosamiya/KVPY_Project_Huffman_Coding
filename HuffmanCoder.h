@@ -1,3 +1,11 @@
+/*
+
+HuffmanCoder declaration and definition
+
+Copyright 2013 Jay H. Bosamiya
+
+*/
+
 #include <string>
 #include <algorithm>
 #include <vector>
@@ -23,7 +31,7 @@ template<int K> class HuffmanCoder {
 	};
 	Node *root;
 	int N;
-	
+
 	void generateCodes(Node* t,std::string s) {
 		if ( t == NULL ) return;
 		if ( t->isVertex ) {
@@ -34,9 +42,9 @@ template<int K> class HuffmanCoder {
 			generateCodes( t->children[i] , s + (char)(i+'0') );
 		}
 	}
-	
+
 	static const float EPSILON = 1e-9; // minimum probability under which it assumes non existent
-	
+
 	public:
 	void makeTree(int n, float list[]) {
 		N = n;
@@ -79,7 +87,7 @@ template<int K> class HuffmanCoder {
 		root = heap[0].second;
 		generateCodes(root,"");
 	}
-	
+
 	bool getCode(int i, std::string &s) {
 		if ( i < 0 || i >= N ) {
 			return false;
@@ -87,7 +95,7 @@ template<int K> class HuffmanCoder {
 		s = encoded[i];
 		return true;
 	}
-	
+
 	float averageLength() {
 		float runningTotal = 0;
 		for ( int i = 0 ; i < N ; i++ ) {
