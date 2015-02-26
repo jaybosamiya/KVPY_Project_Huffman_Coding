@@ -34,3 +34,9 @@ Solution for Ternary Huffman Coding
 -----------------------------------
 
 Do the same as Binary Huffman Coding except 3 trees must be combined and the symbols assigned should be 0 to left sibling, 1 to middle sibling and 2 to right sibling.
+
+
+License
+-------
+
+[MIT License](http://jay.mit-license.org/2013)
